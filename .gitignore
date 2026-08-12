@@ -15,4 +15,4 @@ terraform/*.pem
 # macOS
 .DS_Store
 
-server 
+/server
