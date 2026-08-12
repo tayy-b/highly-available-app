@@ -1,3 +1,5 @@
+# Highly available app
+
 ## Run Locally
 
 ### 1. Start local Postgres
@@ -150,6 +152,6 @@ Expected:
 - `GET /health` returns `200` with `{"ok": true}`
 - `POST /events` returns `201` with `{"status":"created"}`
 
----
+
 
 
