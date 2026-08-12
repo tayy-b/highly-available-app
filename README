@@ -1,4 +1,4 @@
-To Run locally:
+# To Run locally:
 
 Start local Postgres:
 - docker compose up -d db
@@ -17,9 +17,10 @@ Expected:
 - GET /health returns 200 with {"ok": true}
 - POST /events returns 201 with {"status":"created"}
 
+---
 
 
-Running via AWS:
+# Running via AWS:
 
 1. Prerequisites
 - AWS account with permissions for VPC, EC2, ALB, ASG, RDS, ECR, IAM
@@ -96,6 +97,7 @@ Expected:
 - GET /health returns 200 with {"ok": true}
 - POST /events returns 201 with {"status":"created"}
 
+---
 
 
 
