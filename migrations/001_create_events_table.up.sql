@@ -1,0 +1,4 @@
+CREATE TABLE events (
+    id BIGSERIAL PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

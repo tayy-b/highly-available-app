@@ -1,0 +1,18 @@
+# Local environment files
+cmd/server/.env
+.env
+
+# Terraform local state and cache
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/.terraform.tfstate.lock.info
+terraform/*.tfstate
+terraform/*.tfstate.*
+
+# Local SSH/private keys
+terraform/*.pem
+
+# macOS
+.DS_Store
+
+server 

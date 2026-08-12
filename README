@@ -1,0 +1,77 @@
+
+Timestamp API on AWS 
+
+1. Prerequisites
+- AWS account with permissions for VPC, EC2, ALB, ASG, RDS, ECR, IAM
+- AWS CLI, Terraform, Docker, and psql client
+
+2. Configure AWS locally
+- aws configure
+- Set:
+  - AWS Access Key ID
+  - AWS Secret Access Key
+  - Default region: eu-west-2
+  - Default output: json
+
+3. Set tf variables
+Create terraform/terraform.tfvars with:
+
+aws_region   = "eu-west-2"
+db_name      = "events"
+db_username  = "postgres"
+db_password  = ""
+app_image_tag = "latest"
+ec2_key_name  = "your-keypair-name"
+
+4. Deploy infrastructure
+- cd terraform
+- terraform init
+- terraform plan
+- terraform apply -auto-approve
+
+This creates:
+- ECR repo: timestamp-api
+- ALB + Auto Scaling EC2
+- RDS PostgreSQL
+
+5. Build and push Docker image to ECR
+Set your AWS account id:
+
+- AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+Login to ECR:
+
+- aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com
+
+Build and push:
+
+- docker buildx build --platform linux/amd64 -t ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/timestamp-api:latest --push .
+
+6. Run DB migration
+RDS is private, so run migration from an EC2 instance in the VPC (SSH or SSM).
+
+Install psql on EC2:
+- sudo dnf install -y postgresql15
+
+Connect to RDS:
+- psql "postgres://postgres:password@<RDS_ENDPOINT>:5432/events?sslmode=require"
+
+Create table:
+- CREATE TABLE events (
+    id BIGSERIAL PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+
+7. Test API with curl
+Get ALB DNS:
+- ALB_DNS=$(aws elbv2 describe-load-balancers --names timestamp-api-alb --query "LoadBalancers[0].DNSName" --output text)
+
+Health check:
+- curl -i http://${ALB_DNS}/health
+
+Create event:
+- curl -i -X POST http://${ALB_DNS}/events
+
+Expected:
+- GET /health returns 200 with {"ok": true}
+- POST /events returns 201 with {"status":"created"}
