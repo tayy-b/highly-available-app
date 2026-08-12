@@ -1,5 +1,25 @@
+To Run locally:
 
-Timestamp API on AWS 
+Start local Postgres:
+- docker compose up -d db
+
+Run migration:
+- psql "postgres://postgres:change-me@localhost:5433/events?sslmode=disable" -f migrations/001_create_events_table.up.sql
+
+Run API:
+- go run ./cmd/server
+
+Test:
+- curl -i http://localhost:8080/health
+- curl -i -X POST http://localhost:8080/events
+
+Expected:
+- GET /health returns 200 with {"ok": true}
+- POST /events returns 201 with {"status":"created"}
+
+
+
+Running via AWS:
 
 1. Prerequisites
 - AWS account with permissions for VPC, EC2, ALB, ASG, RDS, ECR, IAM
@@ -75,3 +95,7 @@ Create event:
 Expected:
 - GET /health returns 200 with {"ok": true}
 - POST /events returns 201 with {"status":"created"}
+
+
+
+
